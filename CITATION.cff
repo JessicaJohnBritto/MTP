@@ -1,0 +1,37 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: AnyonicJosephsonJunction
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Jessica
+    family-names: John Britto
+    email: jessjohnbritto@gmail.com
+    name-particle: Jessica
+    affiliation: >-
+      Indian Institute of Technology Kharagpur, Raman
+      Research Institute, Bangalore, India
+    orcid: 'https://orcid.org/0009-0008-0140-9306'
+identifiers:
+  - type: url
+    value: 'https://github.com/JessicaJohnBritto/MTP'
+abstract: >-
+  The codes developed in this repository are part of my
+  Master's thesis project on Transport Properties in Anyonic
+  Josephson Junction. I am currently studying Quantum Walks
+  and Phase Transitions in 1D Bose Hubbard Model, so you
+  will find codes related to this for the moment. This
+  repository will be updated and organized once a milestone
+  is completed.
+keywords:
+  - Quantum Many Body Physics
+  - Quantum Condensed Matter Physics
+  - Anyons
+  - Bose Hubbard Model
+  - Phase Diagrams
+  - Quantum Walks
+license: Apache-2.0
