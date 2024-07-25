@@ -8,8 +8,8 @@ message: >-
   metadata from this file.
 type: software
 authors:
-  - given-names: Jessica
-    family-names: John Britto
+  - family-names: John Britto
+    name-particle: Jessica
     email: jessjohnbritto@gmail.com
     affiliation: >-
       Indian Institute of Technology Kharagpur, Raman
