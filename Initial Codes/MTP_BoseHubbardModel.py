@@ -255,7 +255,9 @@
 # Hr, _  = HamiltonianElements(params)
 # print(Hr)
 
-
+from pyblock2.driver.core import DMRGDriver, SymmetryTypes, MPOAlgorithmTypes
+import numpy as np
+import matplotlib.pyplot as plt
 # Initial Script
 params={
     'L': 20,
@@ -267,58 +269,44 @@ params={
 }
 params['t_list'] = np.arange(0, 1, 0.1)
 
-def initialVals(params, **kwargs):
-    '''
-    Constructs states and matrix representation of operators in local hilbert space.
-    Adds on-site potential and chemical potential terms to 'b'.
-    Returns Q - Quantum Number Wrapper, b - ExprBuilder object, driver - DMRGDriver Object
-    '''    
-    driver = DMRGDriver(scratch="./tmp", symm_type=SymmetryTypes.SAny, n_threads=4)
-    
-    driver.set_symmetry_groups("U1")
-    Q = driver.bw.SX
-    site_basis, site_ops = [], []
 
-    for k in range(params['L']):
-        basis = [(Q(i), 1) for i in range(params['n_max'] + 1)] 
-        ops = {
-            "": np.identity(params['n_max'] + 1),                           # identity
-            "C": np.diag(np.sqrt(np.arange(1, params['n_max'] + 1)), k=-1), # creation Op
-            "D": np.diag(np.sqrt(np.arange(1, params['n_max'] + 1)), k=1),  # annihilation Op
-            "N": np.diag(np.arange(0, params['n_max'] + 1), k=0),           # Number Operator
-        }
-        site_basis.append(basis)
-        site_ops.append(ops)
-    driver.initialize_system(n_sites=params['L'], vacuum=Q(0), target=Q(params['n_boson']), hamil_init=False)
-    driver.ghamil = driver.get_custom_hamiltonian(site_basis, site_ops)
-    b = driver.expr_builder()
-    b.add_term("N", np.array(np.arange(params['L'])), -(params['mu'] + params['u'] / 2))
-    b.add_term("NN", np.repeat(np.arange(params['L']), 2), params['u'] / 2)
-
-    return Q, driver, b
-Q, driver, b = initialVals(params)
-
-def plot_FirstExcitationGapVsJ(params, **kwargs):
-    '''
-    Returns plot of First Excitation Gap as a function of J.
-    '''
-    Q, driver, b = initialVals(params)
-    gaps = []
-    for T in params['t_list']:
-        b.add_term("CD", np.array([[i, i+1, i+1, i] for i in range(params['L']-1)]).flatten(), -T)
-        mpo = driver.get_mpo(b.finalize(adjust_order=True, fermionic_ops=""), algo_type=MPOAlgorithmTypes.FastBipartite)
-        mps = driver.get_random_mps(tag="KET", bond_dim=50, nroots=2)
-        energy = driver.dmrg(mpo, mps, n_sweeps=10, bond_dims=[50] * 4 + [75] * 4,
-            noises=[1e-4] * 4 + [1e-5] * 4 + [0], thrds=[1e-10] * 8, dav_max_iter=30, iprint=0)
-        gaps.append(energy[1] - energy[0])
+driver = DMRGDriver(scratch="./tmp", symm_type=SymmetryTypes.SAny, n_threads=4)
     
-        # print(f"t = {T:.2f}, Ground state energy = {energy[0]:.3f}, First excited state energy = {energy[1]:.3f}, Gap = {energy[1] - energy[0]:.3f}")
-    
-    plt.plot(params['t_list'], gaps, marker='o')
-    plt.xlabel('J')
-    plt.ylabel('First Excitation Energy Gap')
-    plt.title('First Excitation Energy Gap vs. Hopping Parameter J')
-    plt.grid(True)
-    plt.show()
-    pass
-plot_FirstExcitationGapVsJ(params)
+driver.set_symmetry_groups("U1")
+Q = driver.bw.SX
+site_basis, site_ops = [], []
+
+for k in range(params['L']):
+    basis = [(Q(i), 1) for i in range(params['n_max'] + 1)] 
+    ops = {
+        "": np.identity(params['n_max'] + 1),                           # identity
+        "C": np.diag(np.sqrt(np.arange(1, params['n_max'] + 1)), k=-1), # creation Op
+        "D": np.diag(np.sqrt(np.arange(1, params['n_max'] + 1)), k=1),  # annihilation Op
+        "N": np.diag(np.arange(0, params['n_max'] + 1), k=0),           # Number Operator
+    }
+    site_basis.append(basis)
+    site_ops.append(ops)
+driver.initialize_system(n_sites=params['L'], vacuum=Q(0), target=Q(params['n_boson']), hamil_init=False)
+driver.ghamil = driver.get_custom_hamiltonian(site_basis, site_ops)
+b = driver.expr_builder()
+b.add_term("N", np.array(np.arange(params['L'])), -(params['mu'] + params['u'] / 2))
+b.add_term("NN", np.repeat(np.arange(params['L']), 2), params['u'] / 2)
+
+
+gaps = []
+for T in params['t_list']:
+    b.add_term("CD", np.array([[i, i+1, i+1, i] for i in range(params['L']-1)]).flatten(), -T)
+    mpo = driver.get_mpo(b.finalize(adjust_order=True, fermionic_ops=""), algo_type=MPOAlgorithmTypes.FastBipartite)
+    mps = driver.get_random_mps(tag="KET", bond_dim=50, nroots=2)
+    energy = driver.dmrg(mpo, mps, n_sweeps=10, bond_dims=[50] * 4 + [75] * 4,
+        noises=[1e-4] * 4 + [1e-5] * 4 + [0], thrds=[1e-10] * 8, dav_max_iter=30, iprint=0)
+    gaps.append(energy[1] - energy[0])
+
+    # print(f"t = {T:.2f}, Ground state energy = {energy[0]:.3f}, First excited state energy = {energy[1]:.3f}, Gap = {energy[1] - energy[0]:.3f}")
+
+plt.plot(params['t_list'], gaps, marker='o')
+plt.xlabel('J')
+plt.ylabel('First Excitation Energy Gap')
+plt.title('First Excitation Energy Gap vs. Hopping Parameter J')
+plt.grid(True)
+plt.show()
