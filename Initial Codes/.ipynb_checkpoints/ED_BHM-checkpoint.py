@@ -143,6 +143,7 @@ def HamiltonianMatrix(params, **kwargs):
 
 def density_reduced_dmatrix(params, eigenvec, **kwargs):
     '''
+    Based on Multidimensional Numpy Arrays, therefore, works upto 4 sites, 4 particles
     Generates density matrix as well.
     Returns Reduced_density matrix of the left subsystem of the lattice.
     '''
