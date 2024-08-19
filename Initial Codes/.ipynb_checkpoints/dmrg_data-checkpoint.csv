@@ -1,4 +1,1 @@
-L,t,U,N_max,N_boson,ground_state,ground_state_eigenvalue,first_excited_state_eigenvalue,t_list
-9,1.5,5,100,10,ground_state3,0.2,1.1,"[1.5, 2.5]"
-9,2.0,5,100,10,ground_state2,0.3,1.2,"[2.0, 3.0]"
-10,1.0,5,100,10,ground_state1,0.5,1.5,"[1.0, 2.0]"
+L,t,U,N_bosons,N_max,GndEigenval,GndEigenvec,FirstExcitedEigenval,Entropy
